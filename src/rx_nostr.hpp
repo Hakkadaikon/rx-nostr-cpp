@@ -29,7 +29,7 @@ class RxNostr final : public RxNostrInterface
         const std::string&       relay,
         const uint32_t           limit)
     {
-        if (RxNostrSubscribeValidator::validate(this->logger, callback, kinds, relay, limit)) {
+        if (!RxNostrSubscribeValidator::validate(this->logger, callback, kinds, relay, limit)) {
             return false;
         }
 

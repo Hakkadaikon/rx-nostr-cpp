@@ -2,7 +2,7 @@
 #define RX_NOSTR_LIBHV_HPP
 
 #include <cstdio>
-//#include <format>
+#include <thread>
 #include "hv/WebSocketClient.h"
 #include "implode.hpp"
 #include "nostr_event.hpp"
@@ -18,12 +18,16 @@ class RxNostrLibhv final : public RxNostrInterface
     {
         this->logger       = logger;
         this->sub_id       = "";
+        this->eose_cmd     = "";
         this->is_connected = false;
         this->setReconnectInterval(1000, 10000);
     }
 
     ~RxNostrLibhv()
     {
+        if (this->is_connected) {
+            this->unsubscribe();
+        }
     }
 
     bool subscribe(
@@ -49,7 +53,14 @@ class RxNostrLibhv final : public RxNostrInterface
         // TODO: check result
         auto result = this->ws.open(relay.c_str());
 
-        // TODO: make "unique sub_id"
+        // wait until connected
+        while (!ws.isConnected()) {
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        }
+
+        // make unique sub_id
+        this->sub_id   = this->makeUniqueSubId();
+        this->eose_cmd = this->makeEOSECommand(this->sub_id.c_str());
 
         // send subscribe message
         auto cmd = this->makeSubscribeCommand(kinds, limit);
@@ -67,7 +78,7 @@ class RxNostrLibhv final : public RxNostrInterface
         }
 
         //Send unsubscribe message
-        auto cmd = this->makeUnsubscribeCommand();
+        auto cmd = this->makeUnsubscribeCommand(this->sub_id.c_str());
         ws.send(cmd);
 
         //TODO: check result
@@ -95,20 +106,39 @@ class RxNostrLibhv final : public RxNostrInterface
 
     LoggerInterface*    logger;
     NostrEventSubId     sub_id;
+    std::string         eose_cmd;
     hv::WebSocketClient ws;
     reconn_setting_t    reconn;
     NostrEventCallback  callback;
     bool                is_connected;
 
-    std::string makeUnsubscribeCommand()
+    std::string makeUniqueSubId()
+    {
+        return "rx-nostr";
+    }
+
+    std::string makeUnsubscribeCommand(const char* sub_id)
     {
         char cmd[128];
 
         std::snprintf(
             cmd,
             sizeof(cmd),
-            "[\"close\", \"%s\"]",
-            this->sub_id.c_str());
+            "[\"CLOSE\",\"%s\"]",
+            sub_id);
+
+        return std::string(cmd);
+    }
+
+    std::string makeEOSECommand(const char* sub_id)
+    {
+        char cmd[128];
+
+        std::snprintf(
+            cmd,
+            sizeof(cmd),
+            "[\"EOSE\",\"%s\"]",
+            sub_id);
 
         return std::string(cmd);
     }
@@ -128,6 +158,7 @@ class RxNostrLibhv final : public RxNostrInterface
             kinds_str.c_str(),
             limit);
 
+        this->logger->log(LogLevel::DEBUG, std::string("subscribe command: ") + cmd);
         return std::string(cmd);
     }
 
@@ -138,6 +169,16 @@ class RxNostrLibhv final : public RxNostrInterface
 
     void onMessage(const std::string& msg)
     {
+        this->logger->log(LogLevel::DEBUG, msg);
+
+        if (msg.find(this->eose_cmd) != std::string::npos) {
+            auto cmd = this->makeUnsubscribeCommand(this->sub_id.c_str());
+            this->logger->log(LogLevel::DEBUG, "receive EOSE, send unsubscribe command.");
+            this->logger->log(LogLevel::DEBUG, cmd);
+            this->ws.send(cmd);
+            return;
+        }
+
         // TODO json -> entity
         // TODO if receive EOSE, send "ws.send("[\"close\", \"subid\"]")
         // TODO check subid
