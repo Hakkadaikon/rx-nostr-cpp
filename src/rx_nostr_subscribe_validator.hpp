@@ -10,12 +10,8 @@ namespace rx_nostr
 class RxNostrSubscribeValidator final
 {
    public:
-    RxNostrSubscribeValidator(LoggerInterface* logger)
-    {
-        this->logger = logger;
-    }
-
-    bool validate(
+    static bool validate(
+        const LoggerInterface*   logger,
         const NostrEventCallback callback,
         const NostrEventKinds&   kinds,
         const std::string&       relay,

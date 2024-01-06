@@ -14,14 +14,13 @@ class RxNostr final : public RxNostrInterface
    public:
     RxNostr(LoggerInterface* logger)
     {
-        this->rx_nostr            = new RxNostrLibhv(logger);
-        this->subscribe_validator = new RxNostrSubscribeValidator(logger);
+        this->logger   = logger;
+        this->rx_nostr = new RxNostrLibhv(logger);
     }
 
     ~RxNostr()
     {
         delete this->rx_nostr;
-        delete this->subscribe_validator;
     }
 
     bool subscribe(
@@ -30,7 +29,7 @@ class RxNostr final : public RxNostrInterface
         const std::string&       relay,
         const uint32_t           limit)
     {
-        if (!this->subscribe_validator->validate(callback, kinds, relay, limit)) {
+        if (RxNostrSubscribeValidator::validate(this->logger, callback, kinds, relay, limit)) {
             return false;
         }
 
@@ -48,8 +47,8 @@ class RxNostr final : public RxNostrInterface
     }
 
    private:
-    RxNostrInterface*          rx_nostr;
-    RxNostrSubscribeValidator* subscribe_validator;
+    RxNostrInterface* rx_nostr;
+    LoggerInterface*  logger;
 };
 }  // namespace rx_nostr
 
