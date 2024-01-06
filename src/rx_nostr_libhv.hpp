@@ -1,13 +1,13 @@
 #ifndef RX_NOSTR_LIBHV_HPP
 #define RX_NOSTR_LIBHV_HPP
 
-#include <functional>
-#include <hv/hloop.h>
-#include <functional>
+#include <cstdio>
+//#include <format>
+#include "hv/WebSocketClient.h"
+#include "implode.hpp"
 #include "nostr_event.hpp"
 #include "rx_nostr_interface.hpp"
 #include "logger_interface.hpp"
-#include "hv/WebSocketClient.h"
 
 namespace rx_nostr
 {
@@ -17,6 +17,7 @@ class RxNostrLibhv final : public RxNostrInterface
     RxNostrLibhv(LoggerInterface* logger)
     {
         this->logger       = logger;
+        this->sub_id       = "";
         this->is_connected = false;
         this->setReconnectInterval(1000, 10000);
     }
@@ -49,8 +50,10 @@ class RxNostrLibhv final : public RxNostrInterface
         auto result = this->ws.open(relay.c_str());
 
         // TODO: make "unique sub_id"
-        // TODO: send subscribe message
-        // ws.send("[\"REQ\", \"subid\", {\"kinds\":[...], \"limit\":limit}]");
+
+        // send subscribe message
+        auto cmd = this->makeSubscribeCommand(kinds, limit);
+        ws.send(cmd);
 
         this->is_connected = true;
         return true;
@@ -58,8 +61,15 @@ class RxNostrLibhv final : public RxNostrInterface
 
     bool unsubscribe()
     {
-        //TODO: send unsubscribe message
-        // ws.send("[\"close\", \"subid\"]")
+        if (!this->is_connected) {
+            this->logger->log(LogLevel::WARNING, "cannot unsubscribe while not connected");
+            return false;
+        }
+
+        //Send unsubscribe message
+        auto cmd = this->makeUnsubscribeCommand();
+        ws.send(cmd);
+
         //TODO: check result
         auto result        = ws.close();
         this->is_connected = false;
@@ -82,12 +92,44 @@ class RxNostrLibhv final : public RxNostrInterface
 
    private:
     using NostrEventSubId = std::string;
+
     LoggerInterface*    logger;
     NostrEventSubId     sub_id;
     hv::WebSocketClient ws;
     reconn_setting_t    reconn;
     NostrEventCallback  callback;
     bool                is_connected;
+
+    std::string makeUnsubscribeCommand()
+    {
+        char cmd[128];
+
+        std::snprintf(
+            cmd,
+            sizeof(cmd),
+            "[\"close\", \"%s\"]",
+            this->sub_id.c_str());
+
+        return std::string(cmd);
+    }
+
+    std::string makeSubscribeCommand(const NostrEventKinds& kinds, const uint32_t limit)
+    {
+        // Make kinds string [1, 2, 3] -> "1, 2, 3"
+        std::string kinds_str = implode(kinds.begin(), kinds.end(), ",");
+
+        char cmd[128];
+
+        std::snprintf(
+            cmd,
+            sizeof(cmd),
+            "[\"REQ\", \"%s\", {\"kinds\":[%s], \"limit\":%d}]",
+            this->sub_id.c_str(),
+            kinds_str.c_str(),
+            limit);
+
+        return std::string(cmd);
+    }
 
     void onOpen(void)
     {
@@ -101,7 +143,7 @@ class RxNostrLibhv final : public RxNostrInterface
         // TODO check subid
         NostrEventId      id      = NostrEventId("1");
         NostrEventKind    kind    = NostrEventKind(1);
-        NostrEventTags    tags    = NostrEventTags("1", "2");
+        NostrEventTags    tags    = NostrEventTags();
         NostrEventContent content = NostrEventContent("test content");
         NostrEventContent sig     = NostrEventContent("test sig");
 

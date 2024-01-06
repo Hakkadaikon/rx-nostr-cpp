@@ -28,11 +28,11 @@ class LoggerStdout final : public LoggerInterface
         auto level_str  = this->levelToString(level);
         auto level_size = strlen(level_str);
 
-        for (int ii = 0; ii < level_size; ii++) {
+        for (size_t ii = 0; ii < level_size; ii++) {
             fputc_unlocked(level_str[ii], stdout);
         }
 
-        for (int ii = 0; ii < msg_size; ii++) {
+        for (size_t ii = 0; ii < msg_size; ii++) {
             fputc_unlocked(msg[ii], stdout);
         }
 
@@ -50,6 +50,8 @@ class LoggerStdout final : public LoggerInterface
                 return "[WARNING] ";
             case LogLevel::ERROR:
                 return "[ERROR] ";
+            default:
+                return "[UNKNOWN] ";
         }
     }
 };

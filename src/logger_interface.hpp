@@ -18,8 +18,8 @@ class LoggerInterface
     virtual ~LoggerInterface()
     {
     }
-    virtual void log(LogLevel level, const char* msg) = 0;
-    virtual void log(LogLevel level, std::string msg) = 0;
+    virtual void log(const LogLevel level, const char* msg) const       = 0;
+    virtual void log(const LogLevel level, const std::string msg) const = 0;
 };
 }  // namespace rx_nostr
 

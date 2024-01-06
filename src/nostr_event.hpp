@@ -1,6 +1,7 @@
 #ifndef NOSTR_EVENT_HPP
 #define NOSTR_EVENT_HPP
 
+#include <cstdint>
 #include <string>
 #include <vector>
 
