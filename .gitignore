@@ -74,4 +74,7 @@ dkms.conf
 
 # Executables
 
+# Log file
+*.log
+
 # End of https://www.toptal.com/developers/gitignore/api/c,c++
