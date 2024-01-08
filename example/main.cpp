@@ -1,5 +1,11 @@
+//#define LOCAL
+#ifdef LOCAL
 #include "../src/rx_nostr.hpp"
 #include "../src/logger_stdout.hpp"
+#else
+#include <rx-nostr/rx_nostr.hpp>
+#include <rx-nostr/logger_stdout.hpp>
+#endif
 #include <thread>
 
 using namespace rx_nostr;

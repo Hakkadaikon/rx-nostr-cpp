@@ -1,6 +1,6 @@
 ###############################################################################
 # File        : Malefile
-# Description : Template of makefile.
+# Description : Makefile for dependency install / format
 # Author      : hakkadaikon
 ###############################################################################
 
@@ -39,6 +39,13 @@ install-dep:
 	cd ../..
 	make -C deps/libhv
 	sudo make -C deps/libhv install
+
+install:
+	sudo mkdir -p /usr/local/include/rx-nostr
+	sudo cp -rp src/* /usr/local/include/rx-nostr/
+
+uninstall:
+	sudo rm -rf /usr/local/include/rx-nostr
 
 # format (use clang)
 format:
