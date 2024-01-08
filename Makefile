@@ -7,7 +7,7 @@
 #------------------------------------------------------------------------------
 # Build options
 #------------------------------------------------------------------------------
-.PHONY: format
+.PHONY: format install install-dep uninstall
 # libhv build command
 #   ./configure --with-openssl --with-http_realip_module --with-http_ssl_module \
 #               --with-stream --with-stream_ssl_module --with-http_slice_module
