@@ -20,11 +20,25 @@
 
 install-dep:
 	# yyjson
-	sudo rm -rf deps/yyjson
+	sudo rm -rf deps/
+	mkdir deps/
 	git clone --depth 1 https://github.com/ibireme/yyjson.git deps/yyjson
 	cmake -S deps/yyjson -B deps/yyjson
 	make -C deps/yyjson
 	sudo make -C deps/yyjson install
+	# libhv
+	git clone --depth 1 --recursive git@github.com:ithewei/libhv.git deps/libhv
+	cd deps/libhv &&                    \
+	./configure                         \
+		--with-openssl              \
+		--with-http_realip_module   \
+		--with-http_ssl_module      \
+		--with-stream               \
+		--with-stream_ssl_module    \
+		--with-http_slice_module && \
+	cd ../..
+	make -C deps/libhv
+	sudo make -C deps/libhv install
 
 # format (use clang)
 format:
