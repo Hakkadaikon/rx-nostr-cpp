@@ -1,11 +1,22 @@
 # rx-nostr-cpp  
 ## Summary  
+rx-nostr-cpp is C++ based header only library for easy communication with Nostr relay.
 
 ## Getting Started  
+It can be installed with the following command.
 
 ```bash
 make install-dep
 make install
+```
+
+This library depends on libhv and yyjson, so you need to link these libraries.
+For reference, here are each flag in the sample code.
+
+```make
+CPPFLAGS := -O2 -std=c++2a -Wall
+LDLIBS   := -L/usr/local/lib/libhv.so -L/usr/local/lib/libyyjson.a
+LDFLAGS  := -lpthread -lhv -lstdc++ -lstdc++fs -lssl -lyyjson
 ```
 
 ## Example  
