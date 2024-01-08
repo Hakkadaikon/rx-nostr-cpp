@@ -30,14 +30,16 @@ class NostrEventDecodeYYJSON final : public NostrEventDecodeInterface
         if (json_size != 3) {
             this->logger->log(
                 LogLevel::DEBUG,
-                std::string("invalid json size:") + std::to_string(json_size));
+                std::string("invalid json size: ") + std::to_string(json_size));
             return false;
         }
 
         // Check kind
         auto json_kind = yyjson_get_str(yyjson_arr_get(root, 0));
-        if (strcmp(json_kind, "event") != 0) {
-            this->logger->log(LogLevel::DEBUG, std::string("invalid json kind:") + json_kind);
+        if (strcmp(json_kind, "EVENT") != 0) {
+            this->logger->log(
+                LogLevel::DEBUG,
+                std::string("invalid json kind: ") + json_kind);
             return false;
         }
 
@@ -45,7 +47,7 @@ class NostrEventDecodeYYJSON final : public NostrEventDecodeInterface
         auto sub_id_str = yyjson_get_str(yyjson_arr_get(root, 1));
         if (strcmp(sub_id_str, sub_id.c_str()) != 0) {
             this->logger->log(LogLevel::DEBUG,
-                              std::string("invalid sub_id:") + sub_id_str);
+                              std::string("invalid sub_id: ") + sub_id_str);
             return false;
         }
 

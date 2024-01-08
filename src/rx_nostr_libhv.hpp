@@ -190,6 +190,9 @@ class RxNostrLibhv final : public RxNostrInterface
         NostrEventContent sig     = NostrEventContent("test sig");
 
         auto event = NostrEvent();
+        if (!this->decoder->decode(msg, this->sub_id, event)) {
+            return;
+        }
 
         this->callback(event);
     }
