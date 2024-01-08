@@ -8,15 +8,17 @@
 #include "nostr_event.hpp"
 #include "rx_nostr_interface.hpp"
 #include "logger_interface.hpp"
+#include "nostr_event_decode_interface.hpp"
 
 namespace rx_nostr
 {
 class RxNostrLibhv final : public RxNostrInterface
 {
    public:
-    RxNostrLibhv(LoggerInterface* logger)
+    RxNostrLibhv(LoggerInterface* logger, NostrEventDecodeInterface* decoder)
     {
         this->logger       = logger;
+        this->decoder      = decoder;
         this->sub_id       = "";
         this->eose_cmd     = "";
         this->is_connected = false;
@@ -102,15 +104,14 @@ class RxNostrLibhv final : public RxNostrInterface
     }
 
    private:
-    using NostrEventSubId = std::string;
-
-    LoggerInterface*    logger;
-    NostrEventSubId     sub_id;
-    std::string         eose_cmd;
-    hv::WebSocketClient ws;
-    reconn_setting_t    reconn;
-    NostrEventCallback  callback;
-    bool                is_connected;
+    LoggerInterface*           logger;
+    NostrEventDecodeInterface* decoder;
+    NostrEventSubId            sub_id;
+    std::string                eose_cmd;
+    hv::WebSocketClient        ws;
+    reconn_setting_t           reconn;
+    NostrEventCallback         callback;
+    bool                       is_connected;
 
     std::string makeUniqueSubId()
     {
@@ -188,7 +189,8 @@ class RxNostrLibhv final : public RxNostrInterface
         NostrEventContent content = NostrEventContent("test content");
         NostrEventContent sig     = NostrEventContent("test sig");
 
-        auto event = NostrEvent(id, kind, tags, content, sig);
+        auto event = NostrEvent();
+
         this->callback(event);
     }
 

@@ -34,8 +34,8 @@ DEPENDFILES := $(OBJFILES:.o=.d)
 # Flags
 #------------------------------------------------------------------------------
 CPPFLAGS := -O2 -std=c++2a -Wall -Wreturn-local-addr
-LDLIBS   := -L/usr/local/lib/libhv.so
-LDFLAGS  := -lpthread -lhv -lstdc++ -lstdc++fs -lssl
+LDLIBS   := -L/usr/local/lib/libhv.so -L/usr/local/lib/libyyjson.a
+LDFLAGS  := -lpthread -lhv -lstdc++ -lstdc++fs -lssl -lyyjson
 
 #------------------------------------------------------------------------------
 # Make rules

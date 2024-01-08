@@ -13,6 +13,10 @@
 #               --with-stream --with-stream_ssl_module --with-http_slice_module
 #   make
 #   sudo make install
+# yyjson build command
+#   cmake .
+#   make
+#   sudo make install
 
 # format (use clang)
 format:

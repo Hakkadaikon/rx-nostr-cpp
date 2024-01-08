@@ -5,6 +5,8 @@
 #include "rx_nostr_libhv.hpp"
 #include "nostr_event.hpp"
 #include "logger_interface.hpp"
+#include "nostr_event_decode_interface.hpp"
+#include "nostr_event_decode_yyjson.hpp"
 #include "rx_nostr_subscribe_validator.hpp"
 
 namespace rx_nostr
@@ -15,12 +17,14 @@ class RxNostr final : public RxNostrInterface
     RxNostr(LoggerInterface* logger)
     {
         this->logger   = logger;
-        this->rx_nostr = new RxNostrLibhv(logger);
+        this->decoder  = new NostrEventDecodeYYJSON(logger);
+        this->rx_nostr = new RxNostrLibhv(logger, this->decoder);
     }
 
     ~RxNostr()
     {
         delete this->rx_nostr;
+        delete this->decoder;
     }
 
     bool subscribe(
@@ -47,8 +51,9 @@ class RxNostr final : public RxNostrInterface
     }
 
    private:
-    RxNostrInterface* rx_nostr;
-    LoggerInterface*  logger;
+    NostrEventDecodeInterface* decoder;
+    RxNostrInterface*          rx_nostr;
+    LoggerInterface*           logger;
 };
 }  // namespace rx_nostr
 
