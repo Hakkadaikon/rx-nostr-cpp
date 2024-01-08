@@ -78,3 +78,7 @@ dkms.conf
 *.log
 
 # End of https://www.toptal.com/developers/gitignore/api/c,c++
+
+# dependency file
+./deps
+./deps/*
