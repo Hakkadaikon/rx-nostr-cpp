@@ -18,6 +18,14 @@
 #   make
 #   sudo make install
 
+install-dep:
+	# yyjson
+	sudo rm -rf deps/yyjson
+	git clone --depth 1 https://github.com/ibireme/yyjson.git deps/yyjson
+	cmake -S deps/yyjson -B deps/yyjson
+	make -C deps/yyjson
+	sudo make -C deps/yyjson install
+
 # format (use clang)
 format:
 	@clang-format -i \
