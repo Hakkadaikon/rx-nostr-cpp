@@ -7,20 +7,22 @@
 
 namespace rx_nostr
 {
-using NostrEventId        = std::string;
-using NostrEventKind      = uint16_t;
-using NostrEventKinds     = std::vector<uint16_t>;
-using NostrEventTagItem   = std::string;
-using NostrEventTags      = std::vector<std::string>;
-using NostrEventSignature = std::string;
-using NostrEventContent   = std::string;
-using NostrEventSubId     = std::string;
+using NostrEventId        = char*;
+using NostrEventPubkey    = char*;
+using NostrEventKind      = int;
+using NostrEventKinds     = std::vector<int>;
+using NostrEventTagItem   = char*;
+using NostrEventTags      = std::vector<char*>;
+using NostrEventSignature = char*;
+using NostrEventContent   = char*;
+using NostrEventSubId     = char*;
 using NostrEventCreatedAt = uint64_t;
 
 class NostrEvent final
 {
    public:
     NostrEventId        id;
+    NostrEventPubkey    pubkey;
     NostrEventKind      kind;
     NostrEventTags      tags;
     NostrEventContent   content;

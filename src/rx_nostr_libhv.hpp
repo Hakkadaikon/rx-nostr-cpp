@@ -19,7 +19,7 @@ class RxNostrLibhv final : public RxNostrInterface
     {
         this->logger       = logger;
         this->decoder      = decoder;
-        this->sub_id       = "";
+        this->sub_id       = nullptr;
         this->eose_cmd     = "";
         this->is_connected = false;
         this->setReconnectInterval(1000, 10000);
@@ -62,7 +62,7 @@ class RxNostrLibhv final : public RxNostrInterface
 
         // make unique sub_id
         this->sub_id   = this->makeUniqueSubId();
-        this->eose_cmd = this->makeEOSECommand(this->sub_id.c_str());
+        this->eose_cmd = this->makeEOSECommand(this->sub_id);
 
         // send subscribe message
         auto cmd = this->makeSubscribeCommand(kinds, limit);
@@ -80,7 +80,7 @@ class RxNostrLibhv final : public RxNostrInterface
         }
 
         //Send unsubscribe message
-        auto cmd = this->makeUnsubscribeCommand(this->sub_id.c_str());
+        auto cmd = this->makeUnsubscribeCommand(this->sub_id);
         ws.send(cmd);
 
         //TODO: check result
@@ -113,9 +113,9 @@ class RxNostrLibhv final : public RxNostrInterface
     NostrEventCallback         callback;
     bool                       is_connected;
 
-    std::string makeUniqueSubId()
+    NostrEventSubId makeUniqueSubId()
     {
-        return "rx-nostr";
+        return "rx_nostr";
     }
 
     std::string makeUnsubscribeCommand(const char* sub_id)
@@ -131,7 +131,7 @@ class RxNostrLibhv final : public RxNostrInterface
         return std::string(cmd);
     }
 
-    std::string makeEOSECommand(const char* sub_id)
+    std::string makeEOSECommand(NostrEventSubId sub_id)
     {
         char cmd[128];
 
@@ -155,7 +155,7 @@ class RxNostrLibhv final : public RxNostrInterface
             cmd,
             sizeof(cmd),
             "[\"REQ\", \"%s\", {\"kinds\":[%s], \"limit\":%d}]",
-            this->sub_id.c_str(),
+            this->sub_id,
             kinds_str.c_str(),
             limit);
 
@@ -170,24 +170,16 @@ class RxNostrLibhv final : public RxNostrInterface
 
     void onMessage(const std::string& msg)
     {
-        this->logger->log(LogLevel::DEBUG, msg);
+        // dump raw message
+        //this->logger->log(LogLevel::DEBUG, msg);
 
         if (msg.find(this->eose_cmd) != std::string::npos) {
-            auto cmd = this->makeUnsubscribeCommand(this->sub_id.c_str());
+            auto cmd = this->makeUnsubscribeCommand(this->sub_id);
             this->logger->log(LogLevel::DEBUG, "receive EOSE, send unsubscribe command.");
             this->logger->log(LogLevel::DEBUG, cmd);
             this->ws.send(cmd);
             return;
         }
-
-        // TODO json -> entity
-        // TODO if receive EOSE, send "ws.send("[\"close\", \"subid\"]")
-        // TODO check subid
-        NostrEventId      id      = NostrEventId("1");
-        NostrEventKind    kind    = NostrEventKind(1);
-        NostrEventTags    tags    = NostrEventTags();
-        NostrEventContent content = NostrEventContent("test content");
-        NostrEventContent sig     = NostrEventContent("test sig");
 
         auto event = NostrEvent();
         if (!this->decoder->decode(msg, this->sub_id, event)) {

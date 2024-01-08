@@ -28,46 +28,97 @@ class NostrEventDecodeYYJSON final : public NostrEventDecodeInterface
         // Check array size
         auto json_size = yyjson_arr_size(root);
         if (json_size != 3) {
-            this->logger->log(
-                LogLevel::DEBUG,
-                std::string("invalid json size: ") + std::to_string(json_size));
+            this->logger->log(LogLevel::DEBUG, std::string("invalid json size: ") + std::to_string(json_size));
             return false;
         }
 
         // Check kind
         auto json_kind = yyjson_get_str(yyjson_arr_get(root, 0));
         if (strcmp(json_kind, "EVENT") != 0) {
-            this->logger->log(
-                LogLevel::DEBUG,
-                std::string("invalid json kind: ") + json_kind);
+            this->logger->log(LogLevel::DEBUG, std::string("invalid json kind: ") + json_kind);
             return false;
         }
 
         // Check subscription id
         auto sub_id_str = yyjson_get_str(yyjson_arr_get(root, 1));
-        if (strcmp(sub_id_str, sub_id.c_str()) != 0) {
+        if (strcmp(sub_id_str, sub_id) != 0) {
             this->logger->log(LogLevel::DEBUG,
                               std::string("invalid sub_id: ") + sub_id_str);
             return false;
         }
 
-        //TODO: parse event data
+        //-----------------------
+        //parse event data
+        //-----------------------
+        // id
+        auto json_data = yyjson_arr_get(root, 2);
+        event.id       = (char*)getString(json_data, "id");
+        if (event.id == nullptr) {
+            this->logger->log(LogLevel::DEBUG, "invalid event id");
+            return false;
+        }
 
+        // pubkey
+        event.pubkey = (char*)getString(json_data, "pubkey");
+        if (event.pubkey == nullptr) {
+            this->logger->log(LogLevel::DEBUG, "invalid event pubkey");
+            return false;
+        }
+
+        // kind
+        event.kind = getNumber<NostrEventKind>(json_data, "kind");
+        if (event.kind == FAILED_GET_VALUE) {
+            this->logger->log(LogLevel::DEBUG, "invalid event kind");
+            return false;
+        }
+
+        // created_at
+        event.created_at = getNumber<NostrEventCreatedAt>(json_data, "created_at");
+        if (event.created_at == FAILED_GET_VALUE) {
+            this->logger->log(LogLevel::DEBUG, "invalid event created_at");
+            return false;
+        }
+
+        // content
+        event.content = (char*)getString(json_data, "content");
+        if (event.content == nullptr) {
+            this->logger->log(LogLevel::DEBUG, "invalid event content");
+            return false;
+        }
+
+        // sig
+        event.sig = (char*)getString(json_data, "sig");
+        if (event.sig == nullptr) {
+            this->logger->log(LogLevel::DEBUG, "invalid event sig");
+            return false;
+        }
+
+        //TODO: parse tags
+        //event.tags =
         return true;
     }
 
    private:
     LoggerInterface* logger;
-    const int        FAILED_GET_VALUE = -1;
+    const int        FAILED_GET_VALUE = 0;
 
-    int getNumber(yyjson_val* json, const char* key) const
+    template <typename T>
+    inline T getNumber(yyjson_val* json, const char* key) const
     {
         auto* val = yyjson_obj_get(json, key);
         if (val == nullptr) {
             return FAILED_GET_VALUE;
         }
 
-        auto conv_val = yyjson_get_int(val);
+        T conv_val;
+        if (typeid(T) == typeid(NostrEventKind)) {
+            conv_val = yyjson_get_int(val);
+        } else if (typeid(T) == typeid(NostrEventCreatedAt)) {
+            conv_val = yyjson_get_uint(val);
+        } else {
+            return FAILED_GET_VALUE;
+        }
+
         if (conv_val == 0) {
             return FAILED_GET_VALUE;
         }
