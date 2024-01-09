@@ -1,0 +1,6 @@
+build
+build/*
+meson/subprojects/yyjson
+meson/subprojects/libhv
+.cache
+.cache/*

@@ -3,21 +3,17 @@
 rx-nostr-cpp is C++ based header only library for easy communication with Nostr relay.
 
 ## Getting Started  
-It can be installed with the following command.
+You can run the example with the following command.
+* meson and ninja must be installed to run make setup/make build.
 
 ```bash
-make install-dep
-make install
+cd example
+make setup
+make build
 ```
 
-This library depends on libhv and yyjson, so you need to link these libraries.
-For reference, here are each flag in the sample code.
-
-```make
-CPPFLAGS := -O2 -std=c++2a -Wall
-LDLIBS   := -L/usr/local/lib/libhv.so -L/usr/local/lib/libyyjson.a
-LDFLAGS  := -lpthread -lhv -lstdc++ -lstdc++fs -lssl -lyyjson
-```
+This project depends on several OSS.
+When developing with rx-nostr-cpp, we recommend using the Makefile and meson configuration files (meson.build, *.wrap) provided in the sample code.
 
 ## Example  
 ### Print nostr event  
@@ -68,6 +64,8 @@ int main(void)
 
 [libhv](https://github.com/ithewei/libhv) - C++ based websocket client  
 [yyjson](https://github.com/ibireme/yyjson) - C based high performance JSON library  
+[meson](https://github.com/mesonbuild/meson) - build automation software.  
+[ninja](https://github.com/ninja-build/ninja) - small build system with a focus on speed.  
 
 ## Author  
 Hakkadaikon

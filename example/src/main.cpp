@@ -20,19 +20,6 @@ static LoggerInterface* logger;
 static int              count = 0;
 static FILE*            fp;
 
-void finalize()
-{
-    if (fp != NULL) {
-        fclose(fp);
-        fp = NULL;
-    }
-
-    if (logger != NULL) {
-        delete logger;
-        logger = NULL;
-    }
-}
-
 void callback(const NostrEvent& event)
 {
     if (count >= MAX_EVENTS) {
@@ -81,11 +68,8 @@ int main(void)
     rx_nostr.unsubscribe();
 
     // so it does not release resources immediately after execution, and you have to wait.
-    logger->log(LogLevel::INFO, "[main] wait 2 seconds");
-    sleep(2);
-
-    logger->log(LogLevel::INFO, "[main] finalize");
-    finalize();
+    logger->log(LogLevel::INFO, "[main] wait 3 seconds");
+    std::this_thread::sleep_for(std::chrono::seconds(3));
 
     logger->log(LogLevel::INFO, "[main] bye");
     return 0;

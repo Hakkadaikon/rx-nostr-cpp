@@ -1,0 +1,5 @@
+[wrap-git]
+directory=libhv
+url=https://github.com/ithewei/libhv.git
+revision=head
+clone_depth=1
