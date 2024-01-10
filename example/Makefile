@@ -10,7 +10,12 @@
 .PHONY: clean setup build format
 
 clean:
-	rm -rf build meson/subprojects/yyjson meson/subprojects/libhv
+	@rm -rf \
+		build \
+		meson/subprojects/yyjson \
+		meson/subprojects/libhv  \
+		meson/subprojects/gflags \
+		meson/subprojects/rocksdb
 
 setup: clean
 	meson setup meson build

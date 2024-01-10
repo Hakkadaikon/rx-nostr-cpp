@@ -11,14 +11,16 @@
 #include <rx-nostr/logger_stdout.hpp>
 #endif
 #include <thread>
-#include <cstdio>
+
+// rocksdb must be installed.
+#include "rocksdb/db.h"
 
 using namespace rx_nostr;
 
 static const int        MAX_EVENTS = 300;
-static LoggerInterface* logger;
-static int              count = 0;
-static FILE*            fp;
+static LoggerInterface* logger     = nullptr;
+static int              count      = 0;
+static rocksdb::DB*     db         = nullptr;
 
 void callback(const NostrEvent& event)
 {
@@ -26,16 +28,7 @@ void callback(const NostrEvent& event)
         return;
     }
 
-    fprintf(fp,
-            "\ncount[%d]\nid:[%s]\npubkey:[%s]\nkind[%d]\ncreated_at[%ld]\nsig[%s]\ncontent:\n%s\n",
-            count,
-            event.id,
-            event.pubkey,
-            event.kind,
-            event.created_at,
-            event.sig,
-            event.content);
-    count++;
+    auto s = db->Put(rocksdb::WriteOptions(), event.id, event.content);
 }
 
 int main(void)
@@ -43,7 +36,13 @@ int main(void)
     logger = new LoggerStdout();
     RxNostr rx_nostr(logger);
 
-    fp = fopen("test.txt", "w");
+    rocksdb::Options options;
+    options.create_if_missing = true;
+    rocksdb::Status status    = rocksdb::DB::Open(options, "./testdb", &db);
+    if (!status.ok()) {
+        logger->log(LogLevel::ERROR, "[main] db open error");
+        return -1;
+    }
 
     rx_nostr.setReconnectInterval(1000, 10000);
 
@@ -54,6 +53,10 @@ int main(void)
         "wss://nos.lol/",
         //"wss://relay.nostr.wirednet.jp/",
         MAX_EVENTS);
+
+    if (!ret) {
+        goto FINALIZE;
+    }
 
     // limit != count
     // If you specify limit, you can get the past N events,
@@ -72,5 +75,15 @@ int main(void)
     std::this_thread::sleep_for(std::chrono::seconds(3));
 
     logger->log(LogLevel::INFO, "[main] bye");
+
+FINALIZE:
+    if (db != nullptr) {
+        delete db;
+    }
+
+    if (logger != nullptr) {
+        delete logger;
+    }
+
     return 0;
 }

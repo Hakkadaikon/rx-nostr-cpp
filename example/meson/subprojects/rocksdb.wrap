@@ -1,0 +1,5 @@
+[wrap-git]
+directory=rocksdb
+url=https://github.com/facebook/rocksdb.git
+revision=head
+clone_depth=1
