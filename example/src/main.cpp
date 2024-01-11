@@ -1,9 +1,9 @@
 // Sample to write received nostr event to file
 
-//#define LOCAL
+#define LOCAL
 #ifdef LOCAL
-#include "../src/rx_nostr.hpp"
-#include "../src/logger_stdout.hpp"
+#include "../../src/rx_nostr.hpp"
+#include "../../src/logger_stdout.hpp"
 #else
 #include <rx-nostr/rx_nostr.hpp>
 #include <rx-nostr/logger_stdout.hpp>

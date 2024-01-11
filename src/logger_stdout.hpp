@@ -13,32 +13,15 @@ class LoggerStdout final : public LoggerInterface
    public:
     void log(const LogLevel level, const char* msg) const
     {
-        auto msg_size = strlen(msg);
-        this->putsUnlocked(level, msg, msg_size);
+        printf("%s%s\n", this->levelToString(level), msg);
     }
 
     void log(const LogLevel level, const std::string msg) const
     {
-        this->putsUnlocked(level, msg.c_str(), msg.size());
+        printf("%s%s\n", this->levelToString(level), msg.c_str());
     }
 
    private:
-    void putsUnlocked(const LogLevel level, const char* msg, const size_t msg_size) const
-    {
-        auto level_str  = this->levelToString(level);
-        auto level_size = strlen(level_str);
-
-        for (size_t ii = 0; ii < level_size; ii++) {
-            fputc_unlocked(level_str[ii], stdout);
-        }
-
-        for (size_t ii = 0; ii < msg_size; ii++) {
-            fputc_unlocked(msg[ii], stdout);
-        }
-
-        fputc_unlocked('\n', stdout);
-    }
-
     const char* levelToString(const LogLevel level) const
     {
         switch (level) {

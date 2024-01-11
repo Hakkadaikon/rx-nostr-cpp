@@ -53,15 +53,12 @@ rocksdb_dep = rocksdb_subproject.dependency('rocksdb')
 # -----------------------------------------------------------------
 sources = ['../src/main.cpp']
 
-# Place librocksdb.a directly under meson.build.
 executable(
   'example',
   sources,
   link_args : [
-    #meson.current_source_dir() / './librocksdb.a',
-    '-lstdc++', '-lstdc++fs',
-    '-lpthread', '-lhv', '-lssl',
-    '-lyyjson'
+    '-lstdc++',
+    '-lpthread', '-lssl'
   ],
   #dependencies: [yyjson_dep, libhv_dep, gflags_dep, rocksdb_dep],
   dependencies: [yyjson_dep, libhv_dep, rocksdb_dep],

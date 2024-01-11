@@ -31,7 +31,6 @@ class NostrEventDecodeYYJSON final : public NostrEventDecodeInterface
         if (json_size != 3) {
             this->logger->log(LogLevel::DEBUG, std::string("invalid json size: ") + std::to_string(json_size));
             result = false;
-            goto FINALIZE;
         }
 
         // Check kind
@@ -39,7 +38,6 @@ class NostrEventDecodeYYJSON final : public NostrEventDecodeInterface
         if (strcmp(json_kind, "EVENT") != 0) {
             this->logger->log(LogLevel::DEBUG, std::string("invalid json kind: ") + json_kind);
             result = false;
-            goto FINALIZE;
         }
 
         // Check subscription id
@@ -48,7 +46,6 @@ class NostrEventDecodeYYJSON final : public NostrEventDecodeInterface
             this->logger->log(LogLevel::DEBUG,
                               std::string("invalid sub_id: ") + sub_id_str);
             result = false;
-            goto FINALIZE;
         }
 
         //-----------------------
@@ -60,7 +57,6 @@ class NostrEventDecodeYYJSON final : public NostrEventDecodeInterface
         if (event.id == nullptr) {
             this->logger->log(LogLevel::DEBUG, "invalid event id");
             result = false;
-            goto FINALIZE;
         }
 
         // pubkey
@@ -68,7 +64,6 @@ class NostrEventDecodeYYJSON final : public NostrEventDecodeInterface
         if (event.pubkey == nullptr) {
             this->logger->log(LogLevel::DEBUG, "invalid event pubkey");
             result = false;
-            goto FINALIZE;
         }
 
         // kind
@@ -76,7 +71,6 @@ class NostrEventDecodeYYJSON final : public NostrEventDecodeInterface
         if (event.kind == FAILED_GET_VALUE) {
             this->logger->log(LogLevel::DEBUG, "invalid event kind");
             result = false;
-            goto FINALIZE;
         }
 
         // created_at
@@ -84,7 +78,6 @@ class NostrEventDecodeYYJSON final : public NostrEventDecodeInterface
         if (event.created_at == FAILED_GET_VALUE) {
             this->logger->log(LogLevel::DEBUG, "invalid event created_at");
             result = false;
-            goto FINALIZE;
         }
 
         // content
@@ -92,7 +85,6 @@ class NostrEventDecodeYYJSON final : public NostrEventDecodeInterface
         if (event.content == nullptr) {
             this->logger->log(LogLevel::DEBUG, "invalid event content");
             result = false;
-            goto FINALIZE;
         }
 
         // sig
@@ -100,7 +92,6 @@ class NostrEventDecodeYYJSON final : public NostrEventDecodeInterface
         if (event.sig == nullptr) {
             this->logger->log(LogLevel::DEBUG, "invalid event sig");
             result = false;
-            goto FINALIZE;
         }
 
 FINALIZE:
