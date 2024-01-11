@@ -14,7 +14,6 @@ clean:
 		build \
 		meson/subprojects/yyjson \
 		meson/subprojects/libhv  \
-		meson/subprojects/gflags \
 		meson/subprojects/rocksdb
 
 setup: clean

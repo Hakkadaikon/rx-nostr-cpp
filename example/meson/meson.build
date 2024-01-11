@@ -29,33 +29,19 @@ libhv_subproject = cmake.subproject(
 libhv_dep = libhv_subproject.dependency('hv')
 # -----------------------------------------------------------------
 
-# # gflags install
-# # -----------------------------------------------------------------
-# gflags_subproject = cmake.subproject(
-#   'gflags'
-#   #'gflags',
-#   #cmake_options: [
-#   #  '-DGFLAGS_INCLUDE_DIR=ON',
-#   #  '-DGFLAGS_LIBRARIES=ON'
-#   #]
-# )
-# 
-# gflags_dep = gflags_subproject.dependency('gflags_static')
-# # -----------------------------------------------------------------
-# 
-# # rocksdb install
-# # -----------------------------------------------------------------
-# rocksdb_subproject = cmake.subproject(
-#   'rocksdb',
-#   cmake_options: [
-#     '-DGFLAGS_INCLUDE_DIR=ON',
-#     '-DGFLAGS_LIBRARIES=ON'
-#   ],
-#   dependencies: [gflags_dep]
-# )
-# 
-# rocksdb_dep = rocksdb_subproject.dependency('rocksdb')
-# # -----------------------------------------------------------------
+# rocksdb install
+# -----------------------------------------------------------------
+rocksdb_subproject = cmake.subproject(
+  'rocksdb',
+  cmake_options: [
+    '-DCMAKE_BUILD_TYPE=Release',
+    '-DBENCHMARK_ENABLE_GTEST_TESTS=0',
+    '-DROCKSDB_BUILD_SHARED=0'
+  ],
+)
+
+rocksdb_dep = rocksdb_subproject.dependency('rocksdb')
+# -----------------------------------------------------------------
 
 # rx-nostr install
 # -----------------------------------------------------------------
@@ -71,12 +57,12 @@ executable(
   'example',
   sources,
   link_args : [
-    meson.current_source_dir() / './librocksdb.a',
+    #meson.current_source_dir() / './librocksdb.a',
     '-lstdc++', '-lstdc++fs',
     '-lpthread', '-lhv', '-lssl',
     '-lyyjson'
   ],
   #dependencies: [yyjson_dep, libhv_dep, gflags_dep, rocksdb_dep],
-  dependencies: [yyjson_dep, libhv_dep],
+  dependencies: [yyjson_dep, libhv_dep, rocksdb_dep],
   install: false)
 # -----------------------------------------------------------------
