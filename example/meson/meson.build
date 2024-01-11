@@ -36,6 +36,7 @@ rocksdb_subproject = cmake.subproject(
   cmake_options: [
     '-DCMAKE_BUILD_TYPE=Release',
     '-DBENCHMARK_ENABLE_GTEST_TESTS=0',
+    '-DWITH_GFLAGS=0',
     '-DROCKSDB_BUILD_SHARED=0'
   ],
 )
