@@ -6,11 +6,6 @@ project(
   default_options : [
     'warning_level=3',
     'cpp_std=c++17'
-  ],
-  link_args : [
-    '-lstdc++', '-lstdc++fs',
-    '-lpthread', '-lhv', '-lssl',
-    '-lyyjson'
   ]
 )
 CXX='g++'
@@ -76,7 +71,10 @@ executable(
   'example',
   sources,
   link_args : [
-    meson.current_source_dir() / './librocksdb.a'
+    meson.current_source_dir() / './librocksdb.a',
+    '-lstdc++', '-lstdc++fs',
+    '-lpthread', '-lhv', '-lssl',
+    '-lyyjson'
   ],
   #dependencies: [yyjson_dep, libhv_dep, gflags_dep, rocksdb_dep],
   dependencies: [yyjson_dep, libhv_dep],
