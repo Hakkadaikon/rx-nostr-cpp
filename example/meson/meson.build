@@ -60,7 +60,6 @@ executable(
     '-lstdc++',
     '-lpthread', '-lssl'
   ],
-  #dependencies: [yyjson_dep, libhv_dep, gflags_dep, rocksdb_dep],
   dependencies: [yyjson_dep, libhv_dep, rocksdb_dep],
   install: false)
 # -----------------------------------------------------------------
